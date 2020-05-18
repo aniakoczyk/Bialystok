@@ -9,7 +9,7 @@ screen = pygame.display.set_mode((900, 600))
 
 
 # Background
-background = pygame.image.load("background.png")
+background = pygame.image.load("background2.png")
 # background position
 backgroundX = 0
 backgroundY = 0
