@@ -1,0 +1,2 @@
+# Bialystok
+projekt z programowania
