@@ -65,22 +65,31 @@ while True:
                 sys.exit(0)
                 
                 
-        #player movements - jeśli strzałka-góra->ruch góra, strzałka-dół->ruch dół
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                playerY_change = -2
-            if event.key == pygame.K_DOWN:
-                playerY_change = 2
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                playerY_change = 0
+        #Player Movement
+    if pygame.key.get_pressed()[pygame.K_d]:
+        playerX += 3
+
+    if pygame.key.get_pressed()[pygame.K_a]:
+        playerX -= 3
+
+    if pygame.key.get_pressed()[pygame.K_w]:
+        playerY -= 3
+
+    if pygame.key.get_pressed()[pygame.K_s]:
+        playerY += 3
 
                 
     #screen borders player - żeby player nie wyjeżdał poza screen
     if playerY <=-10:
         playerY = -10
     elif playerY >= 520:
-        playerY = 520   
+        playerY = 520  
+        
+    if playerX <= 0:
+        playerX = 1
+    elif playerX >= 840:
+        playerX = 839
+        
         
     #ruch player, ruch enemy
     playerY += playerY_change
