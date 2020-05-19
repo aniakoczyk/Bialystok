@@ -4,11 +4,11 @@ import pygame, sys, random
 pygame.init()
 
 
-# Creat the screen
+#Create the screen
 screen = pygame.display.set_mode((900, 600))
 
 
-# Background
+#Background
 background = pygame.image.load("background2.png")
 # background position
 backgroundX = 0
@@ -22,31 +22,31 @@ pygame.display.set_icon(icon)
 
 
 #Player
-playerImg = pygame.image.load("spaceship.png")
+player_image = pygame.image.load("spaceship.png")
 # start position
 playerX = 10
 playerY = 340
+playerY_change = 0
 
 # funkcja wyświetlająca (blit) gracza na ekranie
 def player(x,y):
-    screen.blit((playerImg),(playerX, playerY))
+    screen.blit((player_image),(x, y))
 
 
 #Enemy
-enemyImg = pygame.image.load("monster.png")
-# start position
-enemyX = random.randint(50, 800)
-enemyY = random.randint(0, 570)
-enemyX_change = 2
-enemyY_change = 0
+enemy_image = pygame.image.load("monster.png")
+#start position
+enemyX = random.randint(750, 900)
+enemyY = random.randint(50, 650)
+enemyX_change = -2
+
 
 # funkcja wyświetlająca (blit) wroga na ekranie
 def enemy(x, y):
-    screen.blit((enemyImg), (x, y))
+    screen.blit((enemy_image), (x, y))
 
 # Game Loop (wykonuje się, dopóki program jest włączony)
-running = True
-while running:
+while True:
 
     #Background image
     screen.blit(background, (backgroundX, backgroundY))
@@ -63,9 +63,33 @@ while running:
             # jeśli wciśnęty kalawisz to espace -> wyłącz program
             if event.key == pygame.K_ESCAPE:
                 sys.exit(0)
+                
+                
+        #player movements - jeśli strzałka-góra->ruch góra, strzałka-dół->ruch dół
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                playerY_change = -2
+            if event.key == pygame.K_DOWN:
+                playerY_change = 2
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                playerY_change = 0
 
+                
+    #screen borders player - żeby player nie wyjeżdał poza screen
+    if playerY <=-10:
+        playerY = -10
+    elif playerY >= 520:
+        playerY = 520   
+        
+    #ruch player, ruch enemy
+    playerY += playerY_change
+    enemyX += enemyX_change        
+                
+        
     # wywołanie funkcji enemy i gracza
     enemy(enemyX, enemyY)
     player(playerX, playerY)
+    
     # refresh screen
     pygame.display.update()
