@@ -87,8 +87,8 @@ while True:
         
     if playerX <= 0:
         playerX = 1
-    elif playerX >= 840:
-        playerX = 839
+    elif playerX >= 820:
+        playerX = 819
         
         
     #ruch player, ruch enemy
