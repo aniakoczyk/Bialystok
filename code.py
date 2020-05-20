@@ -1,5 +1,3 @@
-# elo siemandero
-
 import pygame, sys, random
 
 #Initalize the pygame
