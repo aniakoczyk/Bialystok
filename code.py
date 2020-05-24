@@ -5,6 +5,7 @@ pygame.init()
 WIDTH = 900
 HEIGHT = 600
 FPS = 60
+clock = pygame.time.Clock()
 
 
 # define colors(RGB)
@@ -219,7 +220,6 @@ num_of_ship_monster = 10
 for i in range (num_of_ship_monster):
     ship_monster = Ship_monster()
     all_sprites_group.add(ship_monster)
-    enemies_group.add(ship_monster)
     ship_monsters_group.add(ship_monster)
 
 
@@ -278,7 +278,7 @@ while True:
         
         
     # chceck to see if bullet hit a Ship Monster
-    hits = pygame.sprite.groupcollide(enemies_group, bullets_group, True, True, pygame.sprite.collide_circle)
+    hits = pygame.sprite.groupcollide(ship_monsters_group, bullets_group, True, True, pygame.sprite.collide_circle)
     for hit in hits:
         print("eksplozje i takie tam")
         
@@ -286,13 +286,11 @@ while True:
         ship_monster.ready_to_fire = False
         
         
-    # ship Monster shooting
-    ship_monster_mad = random.randint(0,80)
-    if ship_monster_mad == 3:
-        if ship_monster.rect.x < 2000:
-            if ship_monster.ready_to_fire:
-                ship_monster.shoot(ship_monster.rect.centerx - 55, ship_monster.rect.y - 3)
-                pygame.display.update()
+    # check for player collision with ship monster
+    collision = pygame.sprite.spritecollide(player, ship_monsters_group, True, pygame.sprite.collide_circle)
+    if collision:
+        ship_monster.ready_to_fire = False
+        player.shield -= 40
                 
                 
     # check to see if enemy hit player (check for collision)
@@ -312,6 +310,14 @@ while True:
         
         if player.shield <= 0:
             sys.exit(0)
+            
+    # ship Monster shooting
+    ship_monster_mad = random.randint(0,80)
+    if ship_monster_mad == 3:
+        if ship_monster.rect.x < 2000:
+            if ship_monster.ready_to_fire:
+                ship_monster.shoot(ship_monster.rect.centerx - 55, ship_monster.rect.y - 3)
+                pygame.display.update()
             
             
             
