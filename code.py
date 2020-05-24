@@ -300,8 +300,7 @@ while True:
     if collision:
         ship_monster.ready_to_fire = False
         player.shield -= 40
-        expl2 = Explosion(player.rect.center)
-        all_sprites_group.add(expl2)
+     
         if player.shield <= 0:
             sys.exit(0)
             
@@ -310,8 +309,7 @@ while True:
     lobster_attack = pygame.sprite.spritecollide(player, lobsters_group, False, pygame.sprite.collide_circle)
     if lobster_attack:
         player.shield -= 100
-        expl2 = Explosion(player.rect.center)
-        all_sprites_group.add(expl2)
+        
         if player.shield <= 0:
             sys.exit(0)
             
