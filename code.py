@@ -1,4 +1,5 @@
-import pygame, sys, random
+import pygame, sys, random 
+from pygame import mixer
 
 #Initalize
 pygame.init()
@@ -19,7 +20,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
 #Background
-background = pygame.image.load("background2.png")
+background = pygame.image.load("background1.official.png")
 # background position
 backgroundX = 0
 backgroundY = 0
@@ -31,15 +32,40 @@ icon = pygame.image.load("logo.png")
 pygame.display.set_icon(icon)
 
 
+# Load all sounds 
+explosion_sound = mixer.Sound("explosion.wav")
+bullet_sound = mixer.Sound("laser.wav")
+
+# music
+mixer.music.load("arcade.mp3")
+mixer.music.play(0)
+
+
 # Load all images (później się zmieni :D )
-explosionImg = pygame.image.load("explosion.png")
 bulletImg = pygame.image.load("bullet.png")
-playerImg = pygame.image.load("spaceship.png")
+playerImg = pygame.image.load("player.official.png")
 ship_monsterImg = pygame.image.load("ship.png")
 ship_monster_bulletImg = pygame.image.load("fire.png")
 cthulhuImg = pygame.image.load("cthulhu.png")
 lobsterImg = pygame.image.load("lobster.png")
 
+# explosion animation
+explosion_anin = {}
+# lista z grafikami dużymi
+explosion_anin["lg"] = []
+# lista z grafikami małymi
+explosion_anin["sm"] = []
+
+# dodajemy 5 grafik do ich list
+for i in range(5):
+    filename = "regularExplosion0{}.png".format(i)
+    img = pygame.image.load(filename)
+    img_lg = pygame.transform.scale(img, (75, 75))
+    explosion_anin["lg"].append(img_lg)
+    img_sm = pygame.transform.scale(img, (35, 35))
+    explosion_anin["sm"].append(img_sm)
+
+    
 
 # PLAYER
 class Player(pygame.sprite.Sprite):
@@ -101,6 +127,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.bottom = y
         self.rect.centerx = x
         self.radius = 5
+        bullet_sound.play()
         # pygame.draw.circle(self.image, WHITE, self.rect.center, self.radius)
       
 
@@ -202,6 +229,32 @@ class Lobster(pygame.sprite.Sprite):
             self.speedX = -2
             
             
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.size = size
+        self.image = explosion_anin[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 50     
+        
+        
+    def update(self):
+#         zmiana klatek (grafik)
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(explosion_anin[self.size]):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image = explosion_anin[self.size][self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+            
 # Create sprites group
 all_sprites_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
@@ -268,22 +321,31 @@ while True:
     # chceck to see if bullet hit a enemy
     hits = pygame.sprite.groupcollide(enemies_group, bullets_group, True, True, pygame.sprite.collide_circle)
     for hit in hits:
-        print("ekslpozje i takie tam")
+        # dodanie ekspozji do klasy i all_sprites by było ją widać
+        expl = Explosion(hit.rect.center, "lg")
+        all_sprites_group.add(expl)
+        explosion_sound.play()
        
         
     # chceck to see if bullet hit a lobster
     hits = pygame.sprite.groupcollide(lobsters_group, bullets_group, True, True, pygame.sprite.collide_circle)
     for hit in hits:
-        print("eksplozje i takie tam")
+        # dodanie ekspozji do klasy i all_sprites by było ją widać
+        expl = Explosion(hit.rect.center, "lg")
+        all_sprites_group.add(expl)
+        explosion_sound.play()
+       
         
         
     # chceck to see if bullet hit a Ship Monster
     hits = pygame.sprite.groupcollide(ship_monsters_group, bullets_group, True, True, pygame.sprite.collide_circle)
     for hit in hits:
-        print("eksplozje i takie tam")
-        
         # Ship Monster nie może strzelać         
         ship_monster.ready_to_fire = False
+        # dodanie ekspozji do klasy i all_sprites by było ją widać
+        expl = Explosion(hit.rect.center, "lg")
+        all_sprites_group.add(expl)
+        explosion_sound.play()
         
         
     # check for player collision with ship monster
@@ -291,6 +353,11 @@ while True:
     if collision:
         ship_monster.ready_to_fire = False
         player.shield -= 40
+        # dodanie ekspozji do klasy i all_sprites by było ją widać
+        expl = Explosion(collision.rect.center, "lg")
+        all_sprites_group.add(expl)
+        explosion_sound.play()
+       
                 
                 
     # check to see if enemy hit player (check for collision)
@@ -298,17 +365,29 @@ while True:
     if collision:
         ship_monster.ready_to_fire = False
         player.shield -= 40
+        expl = Explosion(collision.rect.center, "lg")
+        all_sprites_group.add(expl)
+        explosion_sound.play()   
      
         if player.shield <= 0:
             sys.exit(0)
-            
+            expl = Explosion(collision.rect.center, "lg")
+            all_sprites_group.add(expl)
+            explosion_sound.play()
+               
             
      # check to see if lobster hit the player
-    lobster_attack = pygame.sprite.spritecollide(player, lobsters_group, False, pygame.sprite.collide_circle)
-    if lobster_attack:
+    hit = pygame.sprite.spritecollide(player, lobsters_group, False, pygame.sprite.collide_circle)
+    if hit:
         player.shield -= 100
+        expl = Explosion(hit.rect.center, "lg")
+        all_sprites_group.add(expl)
+        explosion_sound.play()
         
         if player.shield <= 0:
+            expl = Explosion(hit.rect.center, "lg")
+            all_sprites_group.add(expl)
+            explosion_sound.play()
             sys.exit(0)
             
     # ship Monster shooting
