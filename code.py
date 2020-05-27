@@ -1,4 +1,4 @@
-import pygame, sys, random 
+import pygame, sys, random
 from pygame import mixer
 
 #Initalize
@@ -381,8 +381,7 @@ while True:
         explosion_sound.play()   
      
         if player.shield <= 0:
-            sys.exit(0)
-            expl = Explosion(collision.rect.center, "lg")
+            expl = Explosion(player.rect.center, "lg")
             all_sprites_group.add(expl)
             explosion_sound.play()
                
@@ -391,12 +390,12 @@ while True:
     hit = pygame.sprite.spritecollide(player, lobsters_group, False, pygame.sprite.collide_circle)
     if hit:
         player.shield -= 100
-        expl = Explosion(hit.rect.center, "lg")
+        expl = Explosion(player.rect.center, "lg")
         all_sprites_group.add(expl)
         explosion_sound.play()
         
         if player.shield <= 0:
-            expl = Explosion(hit.rect.center, "lg")
+            expl = Explosion(player.rect.center, "lg")
             all_sprites_group.add(expl)
             explosion_sound.play()
             sys.exit(0)
