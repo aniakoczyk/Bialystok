@@ -146,13 +146,15 @@ class Ship_monster(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width /2 - 12)
         # pygame.draw.circle(self.image, WHITE, self.rect.center, self.radius)
-        self.rect.x = random.randint(800, 3000)
-        self.rect.y = random.randint(50, HEIGHT - 50)
+        self.rect.x = random.randint(1000, 20000)
+        self.rect.y = random.randint(100, HEIGHT - 200)
         # poziom osłony
         self.shield = 100
         self.speedX = 0
         # wskaźnik gotowości do strzału            
         self.ready_to_fire = True
+        #zmienna decydująca czy strzela         
+        self.madness = 0
         
         
     def update(self):
@@ -268,14 +270,22 @@ player = Player()
 all_sprites_group.add(player)
 
 
-# add enemies to their sprite and class
-num_of_ship_monster = 10
+# add Ship Monster to his sprite and class
+num_of_ship_monster = 50
+ship_monster = Ship_monster()
+
+ship_monsters_list = []
 for i in range (num_of_ship_monster):
-    ship_monster = Ship_monster()
-    all_sprites_group.add(ship_monster)
-    ship_monsters_group.add(ship_monster)
+    ship_monster_i = Ship_monster()
+    ship_monsters_list.append(ship_monster_i)
 
+for item in ship_monsters_list:
+    enemies_group.add(item)
+    all_sprites_group.add(item)
+    ship_monsters_group.add(item)
 
+    
+# add Cthulhu to his sprite and class
 num_of_cthulhu = 10
 for i in range (num_of_cthulhu):
     ct = Cthulhu()
@@ -283,6 +293,7 @@ for i in range (num_of_cthulhu):
     enemies_group.add(ct)
 
 
+# add Lobster to his sprite and class
 num_of_lobsters = 10
 for i in range (num_of_lobsters):
     lo = Lobster()
@@ -354,7 +365,7 @@ while True:
         ship_monster.ready_to_fire = False
         player.shield -= 40
         # dodanie ekspozji do klasy i all_sprites by było ją widać
-        expl = Explosion(collision.rect.center, "lg")
+        expl = Explosion(player.rect.center, "lg")
         all_sprites_group.add(expl)
         explosion_sound.play()
        
@@ -365,7 +376,7 @@ while True:
     if collision:
         ship_monster.ready_to_fire = False
         player.shield -= 40
-        expl = Explosion(collision.rect.center, "lg")
+        expl = Explosion(player.rect.center, "lg")
         all_sprites_group.add(expl)
         explosion_sound.play()   
      
@@ -391,11 +402,11 @@ while True:
             sys.exit(0)
             
     # ship Monster shooting
-    ship_monster_mad = random.randint(0,80)
-    if ship_monster_mad == 3:
-        if ship_monster.rect.x < 2000:
-            if ship_monster.ready_to_fire:
-                ship_monster.shoot(ship_monster.rect.centerx - 55, ship_monster.rect.y - 3)
+    for item in ship_monsters_list:
+        item.madness = random.randint(0,100)
+        if item.madness == 3:
+            if item.rect.x < WIDTH:
+                item.shoot(item.rect.x-10, item.rect.y + 20)
                 pygame.display.update()
             
             
