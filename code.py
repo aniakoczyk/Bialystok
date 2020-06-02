@@ -155,6 +155,7 @@ class Ship_monster(pygame.sprite.Sprite):
         self.ready_to_fire = True
         #zmienna decydująca czy strzela         
         self.madness = 0
+        self.alive = True
         
         
     def update(self):
@@ -263,10 +264,12 @@ enemies_group = pygame.sprite.Group()
 bullets_group = pygame.sprite.Group()
 lobsters_group = pygame.sprite.Group()
 ship_monsters_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
 
 
 # add player to class and sprite
 player = Player()
+player_group.add(player)
 all_sprites_group.add(player)
 
 
@@ -280,7 +283,6 @@ for i in range (num_of_ship_monster):
     ship_monsters_list.append(ship_monster_i)
 
 for item in ship_monsters_list:
-    enemies_group.add(item)
     all_sprites_group.add(item)
     ship_monsters_group.add(item)
 
@@ -349,25 +351,32 @@ while True:
         
         
     # chceck to see if bullet hit a Ship Monster
-    hits = pygame.sprite.groupcollide(ship_monsters_group, bullets_group, True, True, pygame.sprite.collide_circle)
-    for hit in hits:
-        # Ship Monster nie może strzelać         
-        ship_monster.ready_to_fire = False
-        # dodanie ekspozji do klasy i all_sprites by było ją widać
-        expl = Explosion(hit.rect.center, "lg")
-        all_sprites_group.add(expl)
-        explosion_sound.play()
+    for item in ship_monsters_list:
+        if item.alive == True:
+            collisions = pygame.sprite.spritecollide(item, bullets_group, True, pygame.sprite.collide_circle)
+            for collision in collisions:
+                expl = Explosion(collision.rect.center, "lg")
+                all_sprites_group.add(expl)
+                explosion_sound.play()
+                item.kill()
+                item.alive = False
+                item.ready_to_fire = False
+            
         
         
     # check for player collision with ship monster
-    collision = pygame.sprite.spritecollide(player, ship_monsters_group, True, pygame.sprite.collide_circle)
-    if collision:
-        ship_monster.ready_to_fire = False
-        player.shield -= 40
-        # dodanie ekspozji do klasy i all_sprites by było ją widać
-        expl = Explosion(player.rect.center, "lg")
-        all_sprites_group.add(expl)
-        explosion_sound.play()
+    for item in ship_monsters_list:
+        if item.alive == True:
+            collisions = pygame.sprite.spritecollide(item, player_group, False, pygame.sprite.collide_circle)
+            for collision in collisions:
+                item.kill()
+                item.alive = False
+                item.ready_to_fire = False
+                player.shield -= 40
+                expl = Explosion(collision.rect.center, "lg")
+                all_sprites_group.add(expl)
+                explosion_sound.play()
+
        
                 
                 
@@ -402,12 +411,13 @@ while True:
             
     # ship Monster shooting
     for item in ship_monsters_list:
-        item.madness = random.randint(0,100)
-        if item.madness == 3:
-            if item.rect.x < WIDTH:
-                item.shoot(item.rect.x-10, item.rect.y + 20)
-                pygame.display.update()
-            
+        if item.ready_to_fire == True:
+            item.madness = random.randint(0,100)
+            if item.madness == 3:
+                if item.rect.x < WIDTH:
+                    item.shoot(item.rect.x-10, item.rect.y + 20)
+                    pygame.display.update()
+
             
             
     # RENDER
