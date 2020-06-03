@@ -4,9 +4,10 @@ from pygame import mixer
 #Initalize
 pygame.init()
 WIDTH = 900
-HEIGHT = 600
+HEIGHT = 630
 FPS = 60
 clock = pygame.time.Clock()
+score = 0
 
 
 # define colors(RGB)
@@ -48,6 +49,7 @@ ship_monsterImg = pygame.image.load("ship.png")
 ship_monster_bulletImg = pygame.image.load("fire.png")
 cthulhuImg = pygame.image.load("cthulhu.png")
 lobsterImg = pygame.image.load("lobster.png")
+pasekImg = pygame.image.load("pasek.png")
 
 # explosion animation
 explosion_anin = {}
@@ -66,7 +68,27 @@ for i in range(5):
     explosion_anin["sm"].append(img_sm)
 
     
+# FUNCTIONS 
+# zielony pasek osłony
+# (screen, x i y, procenty)
+def draw_shield_bar(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 300
+    BAR_HEIGHT = 7
+    fill = (pct/ 100) * BAR_LENGTH
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    pygame.draw.rect(surf, GREEN, fill_rect)
+    
+# wyświetlanie doweolnego tekstu (na czym, tekst, rozmiar, x, y)    
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font("font.ttf", size)
+    text_surface = font.render(text, False, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)    
 
+    
 # PLAYER
 class Player(pygame.sprite.Sprite):
     #sprite for the Player
@@ -338,6 +360,7 @@ while True:
         expl = Explosion(hit.rect.center, "lg")
         all_sprites_group.add(expl)
         explosion_sound.play()
+        score += 10
        
         
     # chceck to see if bullet hit a lobster
@@ -347,6 +370,7 @@ while True:
         expl = Explosion(hit.rect.center, "lg")
         all_sprites_group.add(expl)
         explosion_sound.play()
+        score += 50
        
         
         
@@ -361,6 +385,7 @@ while True:
                 item.kill()
                 item.alive = False
                 item.ready_to_fire = False
+                score += 30
             
         
         
@@ -427,5 +452,16 @@ while True:
 
     # draw everything
     all_sprites_group.draw(screen)
+    
+    #rysowanie całego paska paska
+    screen.blit(pasekImg, (13, 602))
+    
+    # rysowanie poziomu osłon
+    draw_shield_bar(screen, 59, 611, player.shield)
+    
+    #rysowanie pkt
+    draw_text(screen, str(score), 13, 860, 608)
+    
+    
     # after drawing everything, flip the display
     pygame.display.update()
