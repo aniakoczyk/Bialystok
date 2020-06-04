@@ -14,6 +14,7 @@ score = 0
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 250, 0)
+RED = (200, 0, 0)
 
 
 #Create the screen
@@ -36,6 +37,7 @@ pygame.display.set_icon(icon)
 # Load all sounds 
 explosion_sound = mixer.Sound("explosion.wav")
 bullet_sound = mixer.Sound("laser.wav")
+teleport_sound = mixer.Sound("teleport.wav")
 
 # music
 mixer.music.load("arcade.mp3")
@@ -50,7 +52,17 @@ ship_monster_bulletImg = pygame.image.load("fire.png")
 cthulhuImg = pygame.image.load("cthulhu.png")
 lobsterImg = pygame.image.load("lobster.png")
 pasekImg = pygame.image.load("pasek.png")
+teleportImg = pygame.image.load("teleport.png")
 
+# boost animation
+boost_anim = {}
+boost_anim["bo"] = []
+for i in range(3):
+    filename = "turbo.official0{}.png".format(i)
+    img = pygame.image.load(filename)
+    boost_anim["bo"].append(img)
+
+    
 # explosion animation
 explosion_anin = {}
 # lista z grafikami dużymi
@@ -86,8 +98,20 @@ def draw_text(surf, text, size, x, y):
     text_surface = font.render(text, False, WHITE)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
-    surf.blit(text_surface, text_rect)    
-
+    surf.blit(text_surface, text_rect)   
+    
+# wyswietlanie pasku temperatury silnika
+def draw_engine_temp_bar(surf, x, y, pct):
+    # if pct < 0:
+    #     pct = 0
+    BAR_LENGTH = 220
+    BAR_HEIGHT = 5
+    fill = (pct/ 100) * BAR_LENGTH
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH + 50, BAR_HEIGHT)
+    pygame.draw.rect(surf, RED, fill_rect)
+    
+    
     
 # PLAYER
 class Player(pygame.sprite.Sprite):
@@ -108,6 +132,8 @@ class Player(pygame.sprite.Sprite):
         
 #         poziom osłony
         self.shield = 100
+        # temperatura silnika
+        self.engine_temp = 20
 
     def update(self):
         # Movement
@@ -123,6 +149,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y += 3
         if keystate[pygame.K_w]:
             self.rect.y -= 3
+      
             
    # Creat the Boundaries
         if self.rect.right > WIDTH:
@@ -279,6 +306,32 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = explosion_anin[self.size][self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center
+                
+                
+class Boost(pygame.sprite.Sprite):
+    def __init__(self, posx, y,  item):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = boost_anim[item][0]
+        self.rect = self.image.get_rect()
+        self.rect.right = posx
+        self.rect.y = y
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 70
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(boost_anim):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image = boost_anin[self.item][self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+            
             
 # Create sprites group
 all_sprites_group = pygame.sprite.Group()
@@ -346,11 +399,26 @@ while True:
             if event.key == pygame.K_SPACE:
                 player.shoot()
                 
+            #  jeśli naciśnięto spacje, uruchamia się metoda boost, wyświetla grafika i odtwarza dźwiek            if event.key == pygame.K_LSHIFT:
+            if event.key == pygame.K_LSHIFT:
+                if player.engine_temp < 30:
+                    screen.blit(teleportImg, (player.rect.x + 50, player.rect.y - 25))
+                    pygame.display.update()
+                    player.rect.x += 250
+                    player.engine_temp += 100
+                    boost = Boost(player.rect.left + 10, player.rect.y - 20 , "bo")
+                    all_sprites_group.add(boost)
+                    teleport_sound.play()
+                
 
                 
     #UPDATE
     #odświerza wszystkie elementy znajdujące się w grupię all_sprites (wszystko)     
     all_sprites_group.update()
+    
+   #spadek temperatury silników
+    if player.engine_temp >= 20:
+        player.engine_temp -= 0.3
     
     
     # chceck to see if bullet hit a enemy
@@ -461,6 +529,9 @@ while True:
     
     #rysowanie pkt
     draw_text(screen, str(score), 13, 860, 608)
+    
+    #rysowanie poziomu temperatury silnika
+    draw_engine_temp_bar(screen, 437, 612 , player.engine_temp)
     
     
     # after drawing everything, flip the display
