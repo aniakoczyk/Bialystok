@@ -1,3 +1,4 @@
+#minigra napisana z pomocą tutorialu: https://www.youtube.com/watch?v=FfWpgLFMI7w&t=1325s
 import pygame
 import random
 
