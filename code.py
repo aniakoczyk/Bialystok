@@ -46,7 +46,7 @@ game_over_sound = mixer.Sound("over.wav")
 
 # music
 mixer.music.load("music.mp3")
-mixer.music.play(0)
+mixer.music.play(-1)
 
 
 # Load all images (później się zmieni :D )
@@ -54,7 +54,8 @@ bulletImg = pygame.image.load("pocisk.png")
 playerImg = pygame.image.load("player.png")
 ship_monsterImg = pygame.image.load("ship_monster.png")
 ship_monster_bulletImg = pygame.image.load("pocisk_enemy_niebieski.png")
-cthulhuImg = pygame.image.load("cthulhu.png")
+cthulhu_lg = pygame.image.load("cthulhu.png")
+cthulhuImg = pygame.transform.scale(cthulhu_lg, (90, 90))
 lobsterImg = pygame.image.load("lobster.png")
 pasekImg = pygame.image.load("pasek.png")
 teleportImg = pygame.image.load("teleport.png")
@@ -204,10 +205,10 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
 
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
-        if self.rect.top < 0:
-            self.rect.top = 0
+        if self.rect.bottom > HEIGHT - 150:
+            self.rect.bottom = HEIGHT - 150
+        if self.rect.top < 70:
+            self.rect.top = 70
 
     def shoot(self):
         bullet = Bullet(self.rect.right - 2, self.rect.bottom - 6)
@@ -242,8 +243,8 @@ class Ship_monster(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width /2 - 12)
         # pygame.draw.circle(self.image, WHITE, self.rect.center, self.radius)
-        self.rect.x = random.randint(1000, 20000)
-        self.rect.y = random.randint(100, HEIGHT - 200)
+        self.rect.x = random.randint(5000, 20000)
+        self.rect.y = random.randint(60, HEIGHT - 230)
         # poziom osłony
         self.shield = 100
         self.speedX = 0
@@ -292,8 +293,8 @@ class Cthulhu(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width /2 )
         # pygame.draw.circle(self.image, WHITE, self.rect.center, self.radius)
-        self.rect.x = random.randint(1000, 5000)
-        self.rect.y = random.randint(20, 500)
+        self.rect.x = random.randint(1000, 22000)
+        self.rect.y = random.randint(50, HEIGHT - 250)
         # poziom osłony przeciwnika
         self.shield = 100
 
@@ -311,8 +312,8 @@ class Lobster(pygame.sprite.Sprite):
         # pygame.draw.circle(self.image, WHITE, self.rect.center, self.radius)
         # self.rect.x = random.randint(1000, 1500)
         # self.rect.y = random.randint(50, HEIGHT - 50)
-        self.rect.x = random.randint(1000, 3000)
-        self.rect.y = -90
+        self.rect.x = random.randint(5300, 9300)
+        self.rect.y = -100
         # poziom osłony przeciwnika
         self.shield = 100
         self.speedY = 0
@@ -396,7 +397,7 @@ all_sprites_group.add(player)
 
 
 # add Ship Monster to his sprite and class
-num_of_ship_monster = 50
+num_of_ship_monster = 80
 ship_monster = Ship_monster()
 
 ship_monsters_list = []
@@ -410,7 +411,7 @@ for item in ship_monsters_list:
 
     
 # add Cthulhu to his sprite and class
-num_of_cthulhu = 10
+num_of_cthulhu = 200
 for i in range (num_of_cthulhu):
     ct = Cthulhu()
     all_sprites_group.add(ct)
@@ -418,7 +419,7 @@ for i in range (num_of_cthulhu):
 
 
 # add Lobster to his sprite and class
-num_of_lobsters = 10
+num_of_lobsters = 30
 for i in range (num_of_lobsters):
     lo = Lobster()
     all_sprites_group.add(lo)
@@ -574,8 +575,9 @@ while True:
             item.madness = random.randint(0,100)
             if item.madness == 3:
                 if item.rect.x < WIDTH:
-                    item.shoot(item.rect.x-10, item.rect.y + 20)
-                    ship_monster_bullet_sound.play()
+                    if item.rect.x > 0:
+                        item.shoot(item.rect.x-10, item.rect.y + 20)
+                        ship_monster_bullet_sound.play()
 
             
             
@@ -594,7 +596,7 @@ while True:
     draw_shield_bar(screen, 59, 611, player.shield)
     
     #rysowanie pkt
-    draw_text(screen, str(score), 13, 860, 608)
+    draw_text(screen, str(score), 10, 860, 610)
     
     #rysowanie poziomu temperatury silnika
     draw_engine_temp_bar(screen, 437, 612 , player.engine_temp)
