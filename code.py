@@ -128,20 +128,35 @@ def lose_text():
     screen.blit(text_surface, text_rect)
     
     
+def handle_events():
+    for event in pygame.event.get():
+        # jeśli wydardzenie to "wyjście -> wyłącz program"
+        if event.type == pygame.QUIT:
+            sys.exit(0)
+        # jeśli wydarzenie to wcziśniecie klawisza
+        if event.type == pygame.KEYDOWN:
+            # jeśli wciśnęty kalawisz to espace -> wyłącz program
+            if event.key == pygame.K_ESCAPE:
+                sys.exit(0)
+                
+    
    #funkcja uruchamiająca intro nieklikalne z historią i logiem
 def intro():
         text1x = 0
         time = pygame.time.get_ticks()
         while pygame.time.get_ticks() - time < 2500:
+            handle_events()
             screen.blit(plansza1, (0, 0))
             pygame.display.update()
         time = pygame.time.get_ticks()
         while pygame.time.get_ticks() - time < 28500:
+            handle_events()
             screen.blit(text1, (text1x, 100))
             text1x -=1.5
             pygame.display.update()
         time = pygame.time.get_ticks()
         while pygame.time.get_ticks() - time < 5500:
+            handle_events()
             screen.blit(sterowanie, (0, 0))
             pygame.display.update() 
 intro()
