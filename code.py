@@ -58,6 +58,9 @@ cthulhuImg = pygame.image.load("cthulhu.png")
 lobsterImg = pygame.image.load("lobster.png")
 pasekImg = pygame.image.load("pasek.png")
 teleportImg = pygame.image.load("teleport.png")
+plansza1 = pygame.image.load("plansza_poczatek.png")
+text1 = pygame.image.load("text1.png")
+sterowanie = pygame.image.load("sterowanie.png")
 
 # boost animation
 boost_anim = {}
@@ -125,6 +128,23 @@ def lose_text():
     screen.blit(text_surface, text_rect)
     
     
+   #funkcja uruchamiająca intro nieklikalne z historią i logiem
+def intro():
+        text1x = 0
+        time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - time < 2500:
+            screen.blit(plansza1, (0, 0))
+            pygame.display.update()
+        time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - time < 28500:
+            screen.blit(text1, (text1x, 100))
+            text1x -=1.5
+            pygame.display.update()
+        time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - time < 5500:
+            screen.blit(sterowanie, (0, 0))
+            pygame.display.update() 
+intro()
 # PLAYER
 class Player(pygame.sprite.Sprite):
     #sprite for the Player
