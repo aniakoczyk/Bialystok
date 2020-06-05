@@ -1,4 +1,5 @@
 import pygame, sys, random
+import time
 from pygame import mixer
 
 #Initalize
@@ -35,12 +36,15 @@ pygame.display.set_icon(icon)
 
 
 # Load all sounds 
-explosion_sound = mixer.Sound("explosion.wav")
+
 bullet_sound = mixer.Sound("laser.wav")
 teleport_sound = mixer.Sound("teleport.wav")
+enemy_explosion_sound = mixer.Sound("explosion_enemy.wav")
+player_explosion_sound = mixer.Sound("explosion_player.wav")
+game_over_sound = mixer.Sound("over.wav")
 
 # music
-mixer.music.load("arcade.mp3")
+mixer.music.load("music.mp3")
 mixer.music.play(0)
 
 
@@ -72,7 +76,7 @@ explosion_anin["sm"] = []
 
 # dodajemy 5 grafik do ich list
 for i in range(5):
-    filename = "regularExplosion0{}.png".format(i)
+    filename = "eksplozja_player0{}.png".format(i)
     img = pygame.image.load(filename)
     img_lg = pygame.transform.scale(img, (75, 75))
     explosion_anin["lg"].append(img_lg)
@@ -427,7 +431,7 @@ while True:
         # dodanie ekspozji do klasy i all_sprites by było ją widać
         expl = Explosion(hit.rect.center, "lg")
         all_sprites_group.add(expl)
-        explosion_sound.play()
+        enemy_explosion_sound.play()
         score += 10
        
         
@@ -437,7 +441,7 @@ while True:
         # dodanie ekspozji do klasy i all_sprites by było ją widać
         expl = Explosion(hit.rect.center, "lg")
         all_sprites_group.add(expl)
-        explosion_sound.play()
+        enemy_explosion_sound.play()
         score += 50
        
         
@@ -449,7 +453,7 @@ while True:
             for collision in collisions:
                 expl = Explosion(collision.rect.center, "lg")
                 all_sprites_group.add(expl)
-                explosion_sound.play()
+                enemy_explosion_sound.play()
                 item.kill()
                 item.alive = False
                 item.ready_to_fire = False
@@ -468,7 +472,14 @@ while True:
                 player.shield -= 40
                 expl = Explosion(collision.rect.center, "lg")
                 all_sprites_group.add(expl)
-                explosion_sound.play()
+                player_explosion_sound.play()
+                
+                if player.shield <= 0:
+                    expl = Explosion(player.rect.center, "lg")
+                    all_sprites_group.add(expl)
+                    player_explosion_sound.play()
+                    time.sleep(3)
+                    sys.exit(0) 
 
        
                 
@@ -480,27 +491,30 @@ while True:
         player.shield -= 40
         expl = Explosion(player.rect.center, "lg")
         all_sprites_group.add(expl)
-        explosion_sound.play()   
+        player_explosion_sound.play()   
      
         if player.shield <= 0:
             expl = Explosion(player.rect.center, "lg")
             all_sprites_group.add(expl)
-            explosion_sound.play()
-               
+            player_explosion_sound.play()
+            time.sleep(3)
+            sys.exit(0) 
             
      # check to see if lobster hit the player
     hit = pygame.sprite.spritecollide(player, lobsters_group, False, pygame.sprite.collide_circle)
     if hit:
-        player.shield -= 100
+        player.shield -= 90
         expl = Explosion(player.rect.center, "lg")
         all_sprites_group.add(expl)
-        explosion_sound.play()
+        player_explosion_sound.play()
         
         if player.shield <= 0:
             expl = Explosion(player.rect.center, "lg")
             all_sprites_group.add(expl)
-            explosion_sound.play()
+            player_explosion_sound.play()
+            time.sleep(3)
             sys.exit(0)
+            
             
     # ship Monster shooting
     for item in ship_monsters_list:
