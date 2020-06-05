@@ -22,7 +22,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
 #Background
-background = pygame.image.load("background1.official.png")
+background = pygame.image.load("background.png")
 # background position
 backgroundX = 0
 backgroundY = 0
@@ -58,7 +58,7 @@ teleportImg = pygame.image.load("teleport.png")
 boost_anim = {}
 boost_anim["bo"] = []
 for i in range(3):
-    filename = "turbo.official0{}.png".format(i)
+    filename = "turbo0{}.png".format(i)
     img = pygame.image.load(filename)
     boost_anim["bo"].append(img)
 
