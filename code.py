@@ -38,6 +38,7 @@ pygame.display.set_icon(icon)
 # Load all sounds 
 
 bullet_sound = mixer.Sound("laser.wav")
+ship_monster_bullet_sound = mixer.Sound("laser_ship_m.wav")
 teleport_sound = mixer.Sound("teleport.wav")
 enemy_explosion_sound = mixer.Sound("explosion_enemy.wav")
 player_explosion_sound = mixer.Sound("explosion_player.wav")
@@ -115,6 +116,13 @@ def draw_engine_temp_bar(surf, x, y, pct):
     outline_rect = pygame.Rect(x, y, BAR_LENGTH + 50, BAR_HEIGHT)
     pygame.draw.rect(surf, RED, fill_rect)
     
+    
+def lose_text():
+    font = pygame.font.Font("font.ttf", 60)
+    text_surface = font.render("GAME OVER", False, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (WIDTH / 2, HEIGHT /2)
+    screen.blit(text_surface, text_rect)
     
     
 # PLAYER
@@ -475,9 +483,12 @@ while True:
                 player_explosion_sound.play()
                 
                 if player.shield <= 0:
+                    mixer.music.stop()
                     expl = Explosion(player.rect.center, "lg")
                     all_sprites_group.add(expl)
-                    player_explosion_sound.play()
+                    game_over_sound.play()
+                    lose_text()
+                    pygame.display.update()
                     time.sleep(3)
                     sys.exit(0) 
 
@@ -494,9 +505,12 @@ while True:
         player_explosion_sound.play()   
      
         if player.shield <= 0:
+            mixer.music.stop()
             expl = Explosion(player.rect.center, "lg")
             all_sprites_group.add(expl)
-            player_explosion_sound.play()
+            game_over_sound.play()
+            lose_text()
+            pygame.display.update()
             time.sleep(3)
             sys.exit(0) 
             
@@ -509,11 +523,14 @@ while True:
         player_explosion_sound.play()
         
         if player.shield <= 0:
+            mixer.music.stop()
             expl = Explosion(player.rect.center, "lg")
             all_sprites_group.add(expl)
-            player_explosion_sound.play()
+            game_over_sound.play()
+            lose_text()
+            pygame.display.update()
             time.sleep(3)
-            sys.exit(0)
+            sys.exit(0) 
             
             
     # ship Monster shooting
@@ -523,7 +540,7 @@ while True:
             if item.madness == 3:
                 if item.rect.x < WIDTH:
                     item.shoot(item.rect.x-10, item.rect.y + 20)
-                    pygame.display.update()
+                    ship_monster_bullet_sound.play()
 
             
             
